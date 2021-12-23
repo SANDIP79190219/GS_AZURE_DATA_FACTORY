@@ -1,0 +1,9 @@
+{
+	"name": "GSADataFactory",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "ca41eb76-3018-46da-b93f-1dd2733775eb",
+		"tenantId": "5e9d586f-3d8a-4896-95b5-4077ea8b5d50"
+	}
+}
