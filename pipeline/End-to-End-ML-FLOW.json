@@ -1,0 +1,89 @@
+{
+	"name": "End-to-End-ML-FLOW",
+	"properties": {
+		"description": "Implementing an End-to-End Machine Learning Workflow with Azure Data Factory",
+		"activities": [
+			{
+				"name": "Check File Availability",
+				"description": "Check for Availability of latest data streams every hour ",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Data Processing",
+				"description": "Clean Process and Store the output in a secure Data Lake location every time azure function runs successfully ",
+				"type": "DatabricksSparkPython",
+				"dependsOn": [
+					{
+						"activity": "Check File Availability",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Azure ML Pipeline",
+				"description": "Execute the ML pipeline to run the trained model on data extracted from the ADL location ",
+				"type": "AzureMLExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Data Processing",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Move Processed Output to Azure Blob",
+				"description": "Move the output of the ML pipeline in a structured format to Azure Blob Storage ",
+				"type": "AzureDataExplorerCommand",
+				"dependsOn": [
+					{
+						"activity": "Azure ML Pipeline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"commandTimeout": "00:20:00"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
